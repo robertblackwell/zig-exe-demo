@@ -9,7 +9,7 @@ pub fn build(b: *Builder) void {
     exe.addIncludeDir(".");
     exe.addSystemIncludeDir("./lib");
     exe.addIncludeDir("./lib");
-    exe.addCSourceFile("src/lib/c_functions.c", &[_][]const u8{"-std=c99", "-g"});
+    exe.addCSourceFile("src/lib/c_ascii.c", &[_][]const u8{"-std=c99", "-g"});
     exe.linkSystemLibrary("c");
     exe.setOutputDir("build");
     exe.install();
