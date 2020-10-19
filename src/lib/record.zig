@@ -2,11 +2,15 @@ const std = @import("std");
 const z_ascii = @import("z_ascii.zig");
 
 pub const Record = struct {
-    name: []const u8,
-    pub fn init(name: []const u8) Record {
-        return Record {
-            .name = name,
+    name: [100]u8,
+    pub fn init(aname: []const u8) Record {
+        var r = Record {
         };
+        var i = 0;
+        while (i < aname.len) {
+            r.name[i] = aname[i];
+            i = i + 1;
+        }
     }
     pub fn set_name(self: Record, name: []const u8) viod {
         self.name = name;
