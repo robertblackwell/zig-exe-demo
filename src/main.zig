@@ -1,7 +1,11 @@
 const std = @import("std");
 const assert = @import("std").debug.assert;
 
-const zfunctions = @import("lib.zig").z_functions;
+///
+/// the lib.zig file is a consolidator of symbols exported from the lib directory.
+/// look inside the lib.zig file to see how symbols are pulled up from the lib directory
+/// so that clients of the lib  dont need to know where symbols live in the lib dir
+///
 const Record = @import("lib.zig").record.Record;
 const z_ascii = @import("lib.zig").z_ascii;
 
@@ -84,6 +88,17 @@ fn z_cpy(dst: []u8, src: []const u8) []u8 {
     }
     return dst[0..src.len];
 }
+fn z_streq(a: []const u8, b: []const u8) bool {
+    if (a.len != b.len) {
+        return false;
+    }
+    for(a) |ch, i| {
+        if (a[i] != b[i]) {
+            return false;
+        }
+    }
+    return true;
+}
 fn demo_string_copy() void {
     var s = "thisisastring";
     var buf:[100]u8 = [_]u8{0} ** 100;
@@ -111,9 +126,8 @@ fn record_set_name(record: *Record, aname: []const u8) void {
 }
 pub fn main() !void 
 {
-    // set up an allocator
+    // how to allocate memory - needed for the implementation fo Record
     const allocator = std.heap.c_allocator;
-
     var x:[]u8 = try allocator.alloc(u8, 21);
     var y = try allocator.alloc(u8, 9);
     var z = try allocator.alloc(u8, 1);
@@ -124,25 +138,29 @@ pub fn main() !void
     var vers: [*:0]const u8 = c.c_functions_version();
     std.debug.warn("Main - using c_functions version {}\n", .{vers});
 
+    // the next block of calls demo manipulating strings 
+    // and in the case of the demo_zig_xxx also demo zig error handling
+    // inspect the demo_ functions for more understanding
+    // these functions also demonstrate compile time arguments
     demo_zig_toupper_with_error_checking(100);
     demo_zig_toupper_with_error_checking(10);
     demo_c_toupper_with_error_checking(100);
     demo_c_toupper_with_error_checking(10);
     demo_string_copy();
 
+    // these calls demo struct getter and setter for string fields
+    // two different strategies are implemented.
+    // In each case the record takes ownership of the memory that holds
+    // the name and address strings.
+    // the name field is dynamically allocated
+    // the address field is kept in a buffer private to each instance of Record
     var tst = Record.init("hello this is the world", "Andthisisanaddress");
-    std.debug.warn("tst.name is : {}\n", .{tst.name});
-    var xname: []const u8 = "Yetanothername";
-    var allocd_slice = std.heap.c_allocator.alloc(u8, 100) catch unreachable;
-    std.mem.copy(u8, allocd_slice, xname);
-    var new_slice = allocd_slice[0..xname.len];
-    var slx  = allocd_slice;
-    slx = new_slice;
-    tst.name = slx;
-    var nn = @typeName(@TypeOf(tst.name));
-    record_set_name(&tst, "Someonelsesnamehere" );
-    var wn = tst.get_name();
+    std.debug.assert(z_streq("hello this is the world", tst.get_name()));
+    std.debug.assert(z_streq("Andthisisanaddress", tst.get_address()));
     tst.set_name("AnewName");
+    tst.set_address("ANEWADDRT");
+    std.debug.assert(z_streq("AnewName", tst.get_name()));
+    std.debug.assert(z_streq("ANEWADDRT", tst.get_address()));
     std.debug.warn("tst.name is : {}\n", .{tst.name});
 
 }
