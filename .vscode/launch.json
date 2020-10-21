@@ -9,7 +9,7 @@
             "name": "gcc - main",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceRoot}/build/proj01",
+            "program": "${workspaceRoot}/build/main",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
@@ -26,10 +26,10 @@
             "miDebuggerPath": "/usr/bin/gdb"
         },
         {
-            "name": "gcc - build/proj01_test",
+            "name": "gcc - test_main",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceRoot}/build/proj01_test",
+            "program": "${workspaceRoot}/build/test_main",
             "args": ["build","test"],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",

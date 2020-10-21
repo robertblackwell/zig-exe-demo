@@ -7,7 +7,6 @@ const c = @cImport({
     @cInclude("src/lib/c_ascii.h");
 });
 
-
 pub fn main() !void 
 {
     // how to allocate memory - needed for the implementation fo Record

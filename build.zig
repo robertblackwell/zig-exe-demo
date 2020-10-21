@@ -23,7 +23,7 @@ pub fn build(b: *Builder) void {
     const mode = builtin.Mode.Debug;
     b.setPreferredReleaseMode(mode);
 
-    const exe = b.addExecutable("proj01", "src/main.zig");
+    const exe = b.addExecutable("main", "src/main.zig");
     exe.addSystemIncludeDir(".");
     exe.addIncludeDir(".");
     exe.addSystemIncludeDir("./lib");
@@ -37,7 +37,7 @@ pub fn build(b: *Builder) void {
     const run = exe.run();
     run.step.dependOn(b.getInstallStep());
 
-    const test_exe = b.addExecutable("proj01_test", "src/test_main.zig");
+    const test_exe = b.addExecutable("test_main", "src/test_main.zig");
     test_exe.addSystemIncludeDir(".");
     test_exe.addIncludeDir(".");
     test_exe.addSystemIncludeDir("./lib");
