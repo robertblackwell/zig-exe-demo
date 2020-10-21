@@ -1,6 +1,19 @@
 const Builder = @import("std").build.Builder;
 const builtin = @import("builtin");
 
+// pub fn build(b: *Builder) void {
+//     const mode = b.standardReleaseOptions();
+//     const lib = b.addStaticLibrary("http", "src/main.zig");
+//     lib.setBuildMode(mode);
+//     lib.install();
+
+//     var main_tests = b.addTest("src/test.zig");
+//     main_tests.setBuildMode(mode);
+
+//     const test_step = b.step("test", "Run library tests");
+//     test_step.dependOn(&main_tests.step);
+// }
+
 ///
 /// This script builds a single executable named proj01
 /// the main() function for the exec lives in src/main.zig
@@ -23,20 +36,25 @@ pub fn build(b: *Builder) void {
     const mode = builtin.Mode.Debug;
     b.setPreferredReleaseMode(mode);
 
-    const exe = b.addExecutable("main", "src/main.zig");
-    exe.addSystemIncludeDir(".");
-    exe.addIncludeDir(".");
-    exe.addSystemIncludeDir("./lib");
-    exe.addIncludeDir("./lib");
-    exe.addCSourceFile("src/lib/c_ascii.c", &[_][]const u8{"-std=c99", "-g"});
-    exe.linkSystemLibrary("c");
-    // these last 4 lines I dont really understand, but without them the build seemed to run but
-    // no executable could be found after the build
-    exe.setOutputDir("build");
-    exe.install();
-    const run = exe.run();
-    run.step.dependOn(b.getInstallStep());
+    // build the lib
+    const lib = b.addStaticLibrary("zutils", "src/main.zig");
+    lib.addCSourceFile("src/c_ascii.c", &[_][]const u8{"-std=c99", "-g"});
+    lib.linkSystemLibrary("c");
 
+    lib.setBuildMode(mode);
+    lib.install();
+
+    // zig test build - leaving out for the moment
+    const ztest = false;
+    if(ztest) {
+        var main_tests = b.addTest("src/test.zig");
+        main_tests.setBuildMode(mode);
+
+        const test_step = b.step("test", "Run library tests");
+        test_step.dependOn(&main_tests.step);
+    }
+
+    // build the test executable
     const test_exe = b.addExecutable("test_main", "src/test_main.zig");
     test_exe.addSystemIncludeDir(".");
     test_exe.addIncludeDir(".");
