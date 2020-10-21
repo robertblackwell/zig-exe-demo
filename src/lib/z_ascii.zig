@@ -10,6 +10,33 @@ const assert = @import("std").debug.assert;
 pub const ToUpperError = error {
     DestTooSmall,
 };
+/// copy a slice into a buffer and resturn a slice of that buffer representing the copied data
+///
+/// @param dst a slice of a destination buffer - it sets the max value on the size of the copy
+/// @param src a const slice the source from which the copy will come
+/// @return a sub slice of dst representing the data that was copied
+///
+pub fn z_cpy(dst: []u8, src: []const u8) []u8 {
+    var l1 = dst.len;
+    for(src) |ch, i| {
+        dst[i] = src[i];
+    }
+    return dst[0..src.len];
+}
+///
+/// test two slices for equality
+///
+pub fn z_streq(a: []const u8, b: []const u8) bool {
+    if (a.len != b.len) {
+        return false;
+    }
+    for(a) |ch, i| {
+        if (a[i] != b[i]) {
+            return false;
+        }
+    }
+    return true;
+}
 
 ///
 /// performs a to uppercase conversion on a []const u8 entirely in zig

@@ -1,11 +1,15 @@
 #include <stdio.h>
 #include <ctype.h>
 #include <assert.h>
+#include <string.h>
 
 #include "c_ascii.h"
 
 const char* c_functions_version() {
     return "version 0.9.1";
+}
+int c_strlen(const char* in_str) {
+    return strlen(in_str);
 }
 int c_is_ascii_ch(const char ch) {
     return isalpha((int) ch);

@@ -20,7 +20,9 @@ const builtin = @import("builtin");
 /// this is the correct usage as of Oct 2020 and zig version 0.6.0+288198e51
 ///
 pub fn build(b: *Builder) void {
-    const mode = b.standardReleaseOptions();
+    const mode = builtin.Mode.Debug;
+    b.setPreferredReleaseMode(mode);
+
     const exe = b.addExecutable("proj01", "src/main.zig");
     exe.addSystemIncludeDir(".");
     exe.addIncludeDir(".");
@@ -35,6 +37,18 @@ pub fn build(b: *Builder) void {
     const run = exe.run();
     run.step.dependOn(b.getInstallStep());
 
+    const test_exe = b.addExecutable("proj01_test", "src/test_main.zig");
+    test_exe.addSystemIncludeDir(".");
+    test_exe.addIncludeDir(".");
+    test_exe.addSystemIncludeDir("./lib");
+    test_exe.addIncludeDir("./lib");
+    test_exe.addCSourceFile("src/lib/c_ascii.c", &[_][]const u8{"-std=c99", "-g"});
+    test_exe.linkSystemLibrary("c");
+    // these last 4 lines I dont really understand, but without them the build seemed to run but
+    // no executable could be found after the build
+    test_exe.setOutputDir("build");
+    test_exe.install();
+
     // the rest I am experimenting with
 
     // const lib = b.addStaticLibrary("zigtmp", "src/vector.zig");
@@ -48,10 +62,13 @@ pub fn build(b: *Builder) void {
     // lib.setOutputDir("build");
     // lib.install();
 
-    // var zig_test = b.addTest("tests/test_1.zig");
-    // zig_test.setOutputDir("build");
-    // zig_test.setBuildMode(mode);
+    var zig_test = b.addTest("src/test.zig");
+    zig_test.setBuildMode(mode);
+    zig_test.setOutputDir("build");
+    // zig_test.install();
 
-    // const test_step = b.step("test", "Run library tests");
-    // test_step.dependOn(&zig_test.step);
+    const test_step = b.step("test", "Run library tests");
+    test_step.dependOn(&zig_test.step);
+
+
 }

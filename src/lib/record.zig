@@ -88,3 +88,10 @@ pub const Record = struct {
     }
 };
 
+const expect = std.testing.expect;
+const expectError = std.testing.expectError;
+// just to demo a test function
+test "Test Record struct" {
+    const x = 2;
+    expect(x == 2);
+}

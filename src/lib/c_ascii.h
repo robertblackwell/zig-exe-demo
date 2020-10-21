@@ -2,6 +2,8 @@
 #define c_functions_h
 #include <stdio.h>
 
+int c_strlen(const char* in_str);
+
 ///
 /// this is a simple C demo library for converting the ascii members of a string to upper or lower case 
 ///
