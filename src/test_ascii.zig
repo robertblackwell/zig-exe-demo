@@ -2,11 +2,11 @@ const std = @import("std");
 const assert = std.debug.assert;
 const c = @cImport({
     // note this is relative to project dir
-    @cInclude("src/lib/c_ascii.h");
+    @cInclude("src/c_ascii.h");
     @cInclude("string.h");
 });
 
-const z_ascii = @import("z_ascii.zig");
+const z_ascii = @import("ascii.zig");
 
 pub fn test_string_copy() void {
     var s = "thisisastring";

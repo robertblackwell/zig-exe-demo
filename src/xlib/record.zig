@@ -9,7 +9,9 @@ fn mkname(aname: []const u8) []u8 {
     std.mem.copy(u8, tmp, aname);
     return tmp;
 }
-
+pub fn version() [*:0]const u8 {
+    return "Record v1.0.1";
+}
 pub const Record = struct {
     // name is stored as a slice - memory is dynamically allocated for it
     name: []const u8,

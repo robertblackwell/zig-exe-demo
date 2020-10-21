@@ -1,7 +1,7 @@
 const std = @import("std");
 const assert = @import("std").debug.assert;
 
-const z_ascii = @import("z_ascii.zig");
+const z_ascii = @import("ascii.zig");
 const Record = @import("record.zig").Record;
 
 pub fn test_record() void {

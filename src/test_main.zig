@@ -1,10 +1,10 @@
 const std = @import("std");
 
-const test_ascii = @import("lib/test_ascii.zig");
-const test_record = @import("lib/test_record.zig");
+const test_ascii = @import("test_ascii.zig");
+const test_record = @import("test_record.zig");
 
 const c = @cImport({
-    @cInclude("src/lib/c_ascii.h");
+    @cInclude("src/c_ascii.h");
 });
 
 pub fn main() !void 
@@ -14,12 +14,9 @@ pub fn main() !void
     var x:[]u8 = try allocator.alloc(u8, 21);
     var y = try allocator.alloc(u8, 9);
     var z = try allocator.alloc(u8, 1);
-
-    // note putting the c_functions_version() call in the print statement like so
-    // std.debug.warn("main - using c_functions version {}\n", .{c_functions_version()}")
-    // prints the pointer value not the string value
-    var vers: [*:0]const u8 = c.c_functions_version();
-    std.debug.warn("Main - using c_functions version {}\n", .{vers});
+    // demonstrate that zutils with c_functions is linked to this exe
+    var c_rec: [*:0]const u8  = c.c_functions_version();
+    std.debug.warn("c version is : {}\n", .{c_rec});
 
     test_ascii.tests();
     test_record.test_record();

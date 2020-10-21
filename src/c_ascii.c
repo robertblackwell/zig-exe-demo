@@ -6,7 +6,7 @@
 #include "c_ascii.h"
 
 const char* c_functions_version() {
-    return "version 0.9.1";
+    return "c_functions version 0.9.1";
 }
 int c_strlen(const char* in_str) {
     return strlen(in_str);

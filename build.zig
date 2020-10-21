@@ -38,9 +38,12 @@ pub fn build(b: *Builder) void {
 
     // build the lib
     const lib = b.addStaticLibrary("zutils", "src/main.zig");
+    lib.addSystemIncludeDir(".");
+    lib.addIncludeDir(".");
+    lib.addSystemIncludeDir("./src");
+    lib.addIncludeDir("./src");
     lib.addCSourceFile("src/c_ascii.c", &[_][]const u8{"-std=c99", "-g"});
     lib.linkSystemLibrary("c");
-
     lib.setBuildMode(mode);
     lib.install();
 
@@ -49,24 +52,37 @@ pub fn build(b: *Builder) void {
     if(ztest) {
         var main_tests = b.addTest("src/test.zig");
         main_tests.setBuildMode(mode);
-
+        
         const test_step = b.step("test", "Run library tests");
         test_step.dependOn(&main_tests.step);
     }
-
+    if(true) {
+        // build the test executable
+        const main_exe = b.addExecutable("main", "src/main.zig");
+        main_exe.addPackagePath("zutils", "src/lib.zig");
+        main_exe.addIncludeDir(".");
+        main_exe.linkSystemLibrary("c");
+        main_exe.linkLibrary(lib);
+        main_exe.addLibPath("./zig_cache/lib");
+        // these last 4 lines I dont really understand, but without them the build seemed to run but
+        // no executable could be found after the build
+        main_exe.setOutputDir("build");
+        main_exe.install();
+    }
+    if (true) {
     // build the test executable
     const test_exe = b.addExecutable("test_main", "src/test_main.zig");
     test_exe.addSystemIncludeDir(".");
     test_exe.addIncludeDir(".");
-    test_exe.addSystemIncludeDir("./lib");
-    test_exe.addIncludeDir("./lib");
-    test_exe.addCSourceFile("src/lib/c_ascii.c", &[_][]const u8{"-std=c99", "-g"});
+    test_exe.addSystemIncludeDir("./src");
+    test_exe.addIncludeDir("./src");
+    test_exe.addCSourceFile("src/c_ascii.c", &[_][]const u8{"-std=c99", "-g"});
     test_exe.linkSystemLibrary("c");
     // these last 4 lines I dont really understand, but without them the build seemed to run but
     // no executable could be found after the build
     test_exe.setOutputDir("build");
     test_exe.install();
-
+    
     // the rest I am experimenting with
 
     // const lib = b.addStaticLibrary("zigtmp", "src/vector.zig");
@@ -88,5 +104,5 @@ pub fn build(b: *Builder) void {
     const test_step = b.step("test", "Run library tests");
     test_step.dependOn(&zig_test.step);
 
-
+    }
 }

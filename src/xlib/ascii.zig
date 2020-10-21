@@ -4,12 +4,28 @@
 ///
 const std = @import("std");
 const assert = @import("std").debug.assert;
+const c = @cImport({
+    // note this is relative to project dir
+    @cInclude("src/c_ascii.h");
+    @cInclude("string.h");
+});
+
+pub fn z_version() []const u8 {
+    return "v1.0.0";
+}
 
 /// The type of error returned by z_toupper if the buffer 
 /// is too small
 pub const ToUpperError = error {
     DestTooSmall,
 };
+///
+/// force a call into c_ascii and libc
+///
+pub fn z_strlen(s: [*:0]const u8) usize {
+    var len = c.strlen(s);
+    return c.c_strlen(s);
+}
 /// copy a slice into a buffer and resturn a slice of that buffer representing the copied data
 ///
 /// @param dst a slice of a destination buffer - it sets the max value on the size of the copy
