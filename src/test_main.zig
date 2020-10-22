@@ -1,10 +1,10 @@
 const std = @import("std");
 
-const test_ascii = @import("lib/test_ascii.zig");
-const test_record = @import("lib/test_record.zig");
+const test_ascii = @import("zutils/test_ascii.zig");
+const test_record = @import("zutils/test_record.zig");
 
 const c = @cImport({
-    @cInclude("src/lib/c_ascii.h");
+    @cInclude("src/zutils/c_ascii.h");
 });
 
 pub fn main() !void 

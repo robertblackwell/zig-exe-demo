@@ -27,7 +27,7 @@ Goals for this project.
 
 It is likely that this project will evolve in a number of steps as I explore different aspects of Zig.
 
-I will mark those steps with git tags. The first step is tagged V1.0 and corresponds to the first commit that contained a meaningful readme file.
+I will mark those steps with git tags. The first step is tagged v1.0 and corresponds to the first commit that contained a meaningful readme file.
 
 ## v2.0 Update
 
@@ -81,9 +81,15 @@ So what has happened for this update. Well,
 
   ```
   const zutils = @import("zutils");
+
   ```
 
   and  the file`src/lib.zig` determines, or "pulls in", the library symbols to be exported.
+
+## v3.1 Update
+
+Changed directory `lib` and file `lib.zig` to `zutils` and `zutils.zig`. Seems more in keeping with zig practice.
+
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)
 
