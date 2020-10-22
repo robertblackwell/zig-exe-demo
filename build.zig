@@ -44,9 +44,9 @@ pub fn build(b: *Builder) void {
     // Unimaginatively it is called "lib: - will change that on the next
     // evolution.
     //
-    const lib = b.addStaticLibrary("zutils", "src/lib.zig");
+    const lib = b.addStaticLibrary("zutils", "src/zutils.zig");
     lib.addIncludeDir(".");
-    lib.addCSourceFile("src/lib/c_ascii.c", &[_][]const u8{"-std=c99", "-g"});
+    lib.addCSourceFile("src/zutils/c_ascii.c", &[_][]const u8{"-std=c99", "-g"});
     lib.linkSystemLibrary("c");
     lib.setBuildMode(mode);
     lib.install();
@@ -66,7 +66,7 @@ pub fn build(b: *Builder) void {
     //
     // inside src/main.zig
     //
-    main_exe.addPackagePath("zutils", "src/lib.zig");
+    main_exe.addPackagePath("zutils", "src/zutils.zig");
     main_exe.addIncludeDir(".");
     main_exe.linkSystemLibrary("c");
     main_exe.linkLibrary(lib);
@@ -81,7 +81,7 @@ pub fn build(b: *Builder) void {
     test_exe.addIncludeDir(".");
     test_exe.addSystemIncludeDir("./src");
     test_exe.addIncludeDir("./src");
-    test_exe.addCSourceFile("src/lib/c_ascii.c", &[_][]const u8{"-std=c99", "-g"});
+    test_exe.addCSourceFile("src/zutils/c_ascii.c", &[_][]const u8{"-std=c99", "-g"});
     test_exe.linkSystemLibrary("c");
     test_exe.setOutputDir("build");
     test_exe.install();
