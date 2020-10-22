@@ -63,6 +63,27 @@ Finally this tag has this projects first example of __zig__ calling a `libc` fun
 ```
 
 calls the libc function `strlen()`.
+
+## v3.0 Update
+
+Poor prediction. File `z_ascii.zig` only became `ascii.zig` and `c_ascii.c/h` did not changed.
+
+So what has happened for this update. Well, 
+
+- the non test code inside `src/lib` became a real static library, called `libzutils.a`.
+
+- `src/main.zig` is no longer a historical remnant but is a simple program that links against `libzutils` and calls
+  a function from each of the libraries constituent files to prove the link got all the components of the library.
+
+- the significant lesson for this update is the `addPackagePath("zutils", "src/lib.zig")` function call in the build instructions for `src/main.zig`. 
+
+  This is required when building `src/main.zig` into an exe as without it the libraries exported symbols cannot be seen from inside `src/main.zig` It is the zig analogue of what in C would be the libraries header file.  Thus `main.zig` imports the libraries symbols with the line
+
+  ```
+  const zutils = @import("zutils");
+  ```
+
+  and  the file`src/lib.zig` determines, or "pulls in", the library symbols to be exported.
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)
 

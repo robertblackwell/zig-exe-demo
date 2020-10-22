@@ -36,41 +36,46 @@ pub fn build(b: *Builder) void {
     const mode = builtin.Mode.Debug;
     b.setPreferredReleaseMode(mode);
 
-    // build the lib
-    const lib = b.addStaticLibrary("zutils", "src/main.zig");
-    lib.addSystemIncludeDir(".");
+    // build a lib out of src/lib.zig which pulls in 
+    // src/lib/record.zig and src/lib/ascii.zig.
+    //
+    // addCSourceFile() pulls in src/lib/c_ascii.c 
+    //
+    // Unimaginatively it is called "lib: - will change that on the next
+    // evolution.
+    //
+    const lib = b.addStaticLibrary("zutils", "src/lib.zig");
     lib.addIncludeDir(".");
-    lib.addSystemIncludeDir("./src");
-    lib.addIncludeDir("./src");
     lib.addCSourceFile("src/lib/c_ascii.c", &[_][]const u8{"-std=c99", "-g"});
     lib.linkSystemLibrary("c");
     lib.setBuildMode(mode);
     lib.install();
 
-    // zig test build - leaving out for the moment
-    const ztest = false;
-    if(ztest) {
-        var main_tests = b.addTest("src/test.zig");
-        main_tests.setBuildMode(mode);
-        
-        const test_step = b.step("test", "Run library tests");
-        test_step.dependOn(&main_tests.step);
-    }
-    if(true) {
-        // build the test executable
-        const main_exe = b.addExecutable("main", "src/main.zig");
-        main_exe.addPackagePath("zutils", "src/lib.zig");
-        main_exe.addIncludeDir(".");
-        main_exe.linkSystemLibrary("c");
-        main_exe.linkLibrary(lib);
-        main_exe.addLibPath("./zig_cache/lib");
-        // these last 4 lines I dont really understand, but without them the build seemed to run but
-        // no executable could be found after the build
-        main_exe.setOutputDir("build");
-        main_exe.install();
-    }
-    if (true) {
-    // build the test executable
+    // build an exe from src/main.zig and link against lib
+    const main_exe = b.addExecutable("main", "src/main.zig");
+    //
+    // the addPackagePath is a very important line. What does it does
+    // the addStaticLibrary() line actually built the lib library
+    // the addPackagePath() builds the interface for the library
+    // think of it like a cobined header file for all library exports
+    // thats how one would do it in C
+    //
+    // Its what allows one to write:
+    //
+    // const zutils = @import("zutils");
+    //
+    // inside src/main.zig
+    //
+    main_exe.addPackagePath("zutils", "src/lib.zig");
+    main_exe.addIncludeDir(".");
+    main_exe.linkSystemLibrary("c");
+    main_exe.linkLibrary(lib);
+    main_exe.addLibPath("./zig_cache/lib");
+    main_exe.setOutputDir("build");
+    main_exe.install();
+
+    // build the test executable test_main - this does not link against lib
+    // but directly pulls in the source src/lib including all the test files
     const test_exe = b.addExecutable("test_main", "src/test_main.zig");
     test_exe.addSystemIncludeDir(".");
     test_exe.addIncludeDir(".");
@@ -78,8 +83,6 @@ pub fn build(b: *Builder) void {
     test_exe.addIncludeDir("./src");
     test_exe.addCSourceFile("src/lib/c_ascii.c", &[_][]const u8{"-std=c99", "-g"});
     test_exe.linkSystemLibrary("c");
-    // these last 4 lines I dont really understand, but without them the build seemed to run but
-    // no executable could be found after the build
     test_exe.setOutputDir("build");
     test_exe.install();
     
@@ -95,14 +98,14 @@ pub fn build(b: *Builder) void {
     // lib.force_pic = true;
     // lib.setOutputDir("build");
     // lib.install();
+    if( false) {
+        var zig_test = b.addTest("src/test.zig");
+        zig_test.setBuildMode(mode);
+        zig_test.setOutputDir("build");
+        // zig_test.install();
 
-    var zig_test = b.addTest("src/test.zig");
-    zig_test.setBuildMode(mode);
-    zig_test.setOutputDir("build");
-    // zig_test.install();
-
-    const test_step = b.step("test", "Run library tests");
-    test_step.dependOn(&zig_test.step);
+        const test_step = b.step("test", "Run library tests");
+        test_step.dependOn(&zig_test.step);
 
     }
 }
