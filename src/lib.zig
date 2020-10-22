@@ -1,5 +1,5 @@
-pub const record = @import("record.zig");
-pub const ascii = @import("ascii.zig");
+pub const record = @import("lib/record.zig");
+pub const ascii = @import("lib/ascii.zig");
 pub const c = @cImport({
-    @cInclude("src/c_ascii.h");
+    @cInclude("src/lib/c_ascii.h");
 });

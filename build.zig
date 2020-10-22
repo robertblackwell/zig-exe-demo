@@ -42,7 +42,7 @@ pub fn build(b: *Builder) void {
     lib.addIncludeDir(".");
     lib.addSystemIncludeDir("./src");
     lib.addIncludeDir("./src");
-    lib.addCSourceFile("src/c_ascii.c", &[_][]const u8{"-std=c99", "-g"});
+    lib.addCSourceFile("src/lib/c_ascii.c", &[_][]const u8{"-std=c99", "-g"});
     lib.linkSystemLibrary("c");
     lib.setBuildMode(mode);
     lib.install();
@@ -76,7 +76,7 @@ pub fn build(b: *Builder) void {
     test_exe.addIncludeDir(".");
     test_exe.addSystemIncludeDir("./src");
     test_exe.addIncludeDir("./src");
-    test_exe.addCSourceFile("src/c_ascii.c", &[_][]const u8{"-std=c99", "-g"});
+    test_exe.addCSourceFile("src/lib/c_ascii.c", &[_][]const u8{"-std=c99", "-g"});
     test_exe.linkSystemLibrary("c");
     // these last 4 lines I dont really understand, but without them the build seemed to run but
     // no executable could be found after the build

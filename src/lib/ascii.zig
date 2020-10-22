@@ -6,7 +6,7 @@ const std = @import("std");
 const assert = @import("std").debug.assert;
 const c = @cImport({
     // note this is relative to project dir
-    @cInclude("src/c_ascii.h");
+    @cInclude("src/lib/c_ascii.h");
     @cInclude("string.h");
 });
 

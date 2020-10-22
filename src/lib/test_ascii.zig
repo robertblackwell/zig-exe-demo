@@ -6,7 +6,7 @@ const c = @cImport({
     @cInclude("string.h");
 });
 
-const z_ascii = @import("z_ascii.zig");
+const z_ascii = @import("ascii.zig");
 
 pub fn test_string_copy() void {
     var s = "thisisastring";
