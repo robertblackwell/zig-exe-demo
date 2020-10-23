@@ -90,6 +90,60 @@ So what has happened for this update. Well,
 
 Changed directory `lib` and file `lib.zig` to `zutils` and `zutils.zig`. Seems more in keeping with zig practice.
 
+## v4.0 Update 
+
+This update addresses two topics:
+
+- re structures the directory/file structure and changes the build.zig file in preparartion for splitting this project into two git repos.
+- further explores how the `addPackage` build instruction works and whether or not a build of `main.zig` needs to link against `libzutils`.
+
+Its worth noting that all of the effort for this step in the project (and the previous one for that matter) is associated with how to manage and use the zig build system. Nothing to do with the language or zig coding.
+
+### Linking against libzutils
+
+What I discovered while working on this update was that if `main.zig` made no calls to functions in `c_ascii.c` then the `build.zig` file 
+- did not need to have
+```
+        main_exe.addIncludeDir("lib/zutils");
+```
+- did not need to have the 
+```
+        main_exe.linkSystemLibraryName("zutils");
+        main_exe.addLibPath("./lib/zutils/zig-cache/lib");
+```
+- indeed libzutils did not even have to exists.
+
+But if `src/main.zig` did make a call to a function in `c_ascii.` than all of those statements were required.
+
+Would I be right in concluding that when an exe (`src/main.zig`) and a library (`zutils`)consist only of `zig` files, the build of the exe, via an `addPackage` statement, pulls in the library source not the library `.a` or `.so`?
+
+What am I missing.
+
+The file `task.sh` demonstrates what was just described. Executed without an argument it will run 4 scenarious in which it attempts to build and run `main.zig`.
+- build and run  `src/main.zig` without any c calls, without libzutils existing, no `addIncludeDir()`, no `linkSystemLibrary()`. This will run successfully. 
+- build and run `src/main.zig` with C calls, with `libzutils` existing, with `addIncludeDir()` and with `linkSystemLibrary()`. This will run successfully.
+- build `src/main.zig` with C calls, without the `addIncludeDir()`. The build will fail with a `cImport failed error`
+- build `src/main.zig` with C calls, with the `addIncludeDir()` but without the `linkSystemLibrary()`. This build will fail with a linker error " undefined function c_functions_version".
+
+
+### Preparation for a split
+
+My next step on this process is to carve out the library `zutils` s a separate git repo. 
+
+How to do this I copied from [git@github.com:ducdetronquito/h11.git](git@github.com:ducdetronquito/h11.git):
+
+- make a `lib` subdirectory of the project directory at the same level as `src`. This will house a subdirectory for each dependency of the main project. In out case only one.
+
+- make a subdirectory of `lib` called `zutils` which will hold the zutils code as a standalone project with its own `build.zig` file.
+
+  Notice that all the test code, including `test_main.zig` went into this subdir. 
+
+  In the next step of this project this directory will become a git submodule.
+
+- in the `lib` directory create a file called `packages.zig`. See the file and the main `build.zig` file for details of what this file does. 
+
+
+
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)
 
