@@ -1,6 +1,6 @@
 const std = @import("std");
 const utils = @import("zutils");
-
+const main_calls_c_functions = @import("main_options.zig").main_calls_c_functions;
 pub fn main() !void 
 {
     // how to allocate memory - needed for the implementation fo Record
@@ -18,7 +18,10 @@ pub fn main() !void
     std.debug.warn("record version is : {}\n", .{v_rec});
 
     // demonstrate that zutils with c_functions is linked to this exe
-    var c_rec: [*:0]const u8 = utils.c.c_functions_version();
-    std.debug.warn("c version is : {}\n", .{c_rec});
-
+    if (main_calls_c_functions) {
+        var c_rec: [*:0]const u8 = utils.c.c_functions_version();
+        std.debug.warn("c version is : {}\n", .{c_rec});
+    } else {
+        std.debug.warn("main did NOT call c version is : \n", .{});
+    }
 }

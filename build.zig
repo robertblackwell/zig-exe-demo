@@ -1,111 +1,46 @@
 const Builder = @import("std").build.Builder;
 const builtin = @import("builtin");
+const packages = @import("lib/packages.zig");
 
-// pub fn build(b: *Builder) void {
-//     const mode = b.standardReleaseOptions();
-//     const lib = b.addStaticLibrary("http", "src/main.zig");
-//     lib.setBuildMode(mode);
-//     lib.install();
+const options = @import("src/main_options.zig");
 
-//     var main_tests = b.addTest("src/test.zig");
-//     main_tests.setBuildMode(mode);
+// const main_calls_c_functions = @import("src/main_options.zig").main_calls_c_functions;
+// const build_zutils = @import("src/main_options.zig").build_zutils;
+// const link_against_zutils = @import("src/main_options.zig").link_against_zutils;
+// const add_zutils_include_dir = @import("src/main_options.zig").add_zutils_include_dir;
 
-//     const test_step = b.step("test", "Run library tests");
-//     test_step.dependOn(&main_tests.step);
-// }
+const use_package_zig = @import("src/main_options.zig").use_package_zig;
 
-///
-/// This script builds a single executable named proj01
-/// the main() function for the exec lives in src/main.zig
-/// and the imports in the main.zig file pull in all the other zig
-/// files required to build the exe.
-///
-/// However C files are not pulled in automatically, this is achiieved by
-/// the exe.addCSourceFile() line.
-///
-/// The C file(s) will not compile unless the headers they include can be found,
-/// since src/lib is a non standard header search path it must be added.
-/// thats the purpose of :
-///     exe.addIncludeDir() 
-///     exe.addSystemIncludeDir()
-///
-/// WARNING - the calls that add include directories have changed over time.
-/// this is the correct usage as of Oct 2020 and zig version 0.6.0+288198e51
-///
+
 pub fn build(b: *Builder) void {
     const mode = builtin.Mode.Debug;
     b.setPreferredReleaseMode(mode);
 
-    // build a lib out of src/lib.zig which pulls in 
-    // src/lib/record.zig and src/lib/ascii.zig.
-    //
-    // addCSourceFile() pulls in src/lib/c_ascii.c 
-    //
-    // Unimaginatively it is called "lib: - will change that on the next
-    // evolution.
-    //
-    const lib = b.addStaticLibrary("zutils", "src/zutils.zig");
-    lib.addIncludeDir(".");
-    lib.addCSourceFile("src/zutils/c_ascii.c", &[_][]const u8{"-std=c99", "-g"});
-    lib.linkSystemLibrary("c");
-    lib.setBuildMode(mode);
-    lib.install();
-
     // build an exe from src/main.zig and link against lib
     const main_exe = b.addExecutable("main", "src/main.zig");
-    //
-    // the addPackagePath is a very important line. What does it does
-    // the addStaticLibrary() line actually built the lib library
-    // the addPackagePath() builds the interface for the library
-    // think of it like a cobined header file for all library exports
-    // thats how one would do it in C
-    //
-    // Its what allows one to write:
-    //
-    // const zutils = @import("zutils");
-    //
-    // inside src/main.zig
-    //
-    main_exe.addPackagePath("zutils", "src/zutils.zig");
-    main_exe.addIncludeDir(".");
+    // point the build at the zutils package
+    if (options.use_package_zig) {
+        main_exe.addPackage(packages.zutils);
+    } else {
+        main_exe.addPackagePath("zutils", "lib/zutils/src/zutils.zig");
+    }
+    // if main.zig calls any of the c functions in package zutils have to add the next 3 line 
+    // there must be a way to avoid this but without some docs for the build system impossible to
+    // guess how. 
+    // Its worth noting - as a clue - that without the next 3 lines we get a link error not a compile error
+    // so the addPackage() statement exposes the c header files but does not  
+    if (options.add_zutils_include_dir) {
+        main_exe.addIncludeDir("lib/zutils");
+    }
+    if (options.link_against_zutils) {
+        main_exe.linkSystemLibraryName("zutils");
+        main_exe.addLibPath("./lib/zutils/zig-cache/lib");
+    }
+    // since main.zig (or zutils package) might call libc functions link in libc
     main_exe.linkSystemLibrary("c");
-    main_exe.linkLibrary(lib);
-    main_exe.addLibPath("./zig_cache/lib");
+
     main_exe.setOutputDir("build");
+    main_exe.setBuildMode(mode);
     main_exe.install();
 
-    // build the test executable test_main - this does not link against lib
-    // but directly pulls in the source src/lib including all the test files
-    const test_exe = b.addExecutable("test_main", "src/test_main.zig");
-    test_exe.addSystemIncludeDir(".");
-    test_exe.addIncludeDir(".");
-    test_exe.addSystemIncludeDir("./src");
-    test_exe.addIncludeDir("./src");
-    test_exe.addCSourceFile("src/zutils/c_ascii.c", &[_][]const u8{"-std=c99", "-g"});
-    test_exe.linkSystemLibrary("c");
-    test_exe.setOutputDir("build");
-    test_exe.install();
-    
-    // the rest I am experimenting with
-
-    // const lib = b.addStaticLibrary("zigtmp", "src/vector.zig");
-
-    // lib.setBuildMode(mode);
-    // switch (mode) {
-    //     .Debug, .ReleaseSafe => lib.bundle_compiler_rt = true,
-    //     .ReleaseFast, .ReleaseSmall => lib.disable_stack_probing = true,
-    // }
-    // lib.force_pic = true;
-    // lib.setOutputDir("build");
-    // lib.install();
-    if( false) {
-        var zig_test = b.addTest("src/test.zig");
-        zig_test.setBuildMode(mode);
-        zig_test.setOutputDir("build");
-        // zig_test.install();
-
-        const test_step = b.step("test", "Run library tests");
-        test_step.dependOn(&zig_test.step);
-
-    }
 }

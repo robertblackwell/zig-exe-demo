@@ -1,5 +1,5 @@
 const std = @import("std");
-const z_ascii = @import("z_ascii.zig");
+const z_ascii = @import("ascii.zig");
 
 // a const specifying the size of the address buffer
 const address_length = 100;

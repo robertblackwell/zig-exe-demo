@@ -6,12 +6,12 @@ const std = @import("std");
 const assert = @import("std").debug.assert;
 const c = @cImport({
     // note this is relative to project dir
-    @cInclude("src/zutils/c_ascii.h");
+    @cInclude("src/c_ascii.h");
     @cInclude("string.h");
 });
 
 pub fn z_version() []const u8 {
-    return "v1.0.0";
+    return "v1.0.7";
 }
 
 /// The type of error returned by z_toupper if the buffer 
