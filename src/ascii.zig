@@ -11,7 +11,7 @@ const c = @cImport({
 });
 
 pub fn z_version() []const u8 {
-    return "v1.0.7";
+    return "v1.0.9";
 }
 
 /// The type of error returned by z_toupper if the buffer 
