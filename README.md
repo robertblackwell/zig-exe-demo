@@ -119,7 +119,7 @@ Would I be right in concluding that when an exe (`src/main.zig`) and a library (
 
 What am I missing.
 
-The file `task.sh` demonstrates what was just described. Executed without an argument it will run 4 scenarious in which it attempts to build and run `main.zig`.
+The file `task.sh` demonstrates what was just described. Executed without an argument it will run 4 scenarios in which it attempts to build and run `main.zig`.
 - build and run  `src/main.zig` without any c calls, without libzutils existing, no `addIncludeDir()`, no `linkSystemLibrary()`. This will run successfully. 
 - build and run `src/main.zig` with C calls, with `libzutils` existing, with `addIncludeDir()` and with `linkSystemLibrary()`. This will run successfully.
 - build `src/main.zig` with C calls, without the `addIncludeDir()`. The build will fail with a `cImport failed error`
@@ -142,7 +142,22 @@ How to do this I copied from [git@github.com:ducdetronquito/h11.git](git@github.
 
 - in the `lib` directory create a file called `packages.zig`. See the file and the main `build.zig` file for details of what this file does. 
 
+## v5.0 Update
 
+This update splits the zutils code into a separate repo [git@github.com:robertblackwell/zig-lib-demo.git](git@github.com:robertblackwell/zig-lib-demo.git) and re-includes it in this repo as a `git subtree`. 
+
+Here are some references on this process. Seems like an easier option than . But in any case this is such a simple case the choice is not really material.
+[https://medium.com/@porteneuve/mastering-git-submodules-34c65e940407](https://medium.com/@porteneuve/mastering-git-submodules-34c65e940407)
+
+[https://medium.com/@porteneuve/mastering-git-subtrees-943d29a798ec](https://medium.com/@porteneuve/mastering-git-subtrees-943d29a798ec)
+
+This next one is probably the easiest to follow.
+
+[https://docs.github.com/en/free-pro-team@latest/github/using-git/splitting-a-subfolder-out-into-a-new-repository](https://docs.github.com/en/free-pro-team@latest/github/using-git/splitting-a-subfolder-out-into-a-new-repository)
+
+I am not sure where this exercise goes next. My temptation is to build a more realistic library using only zig and to make that a distinct new project.
+
+If that happens I will update this file with a link.
 
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)
